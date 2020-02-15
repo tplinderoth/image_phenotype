@@ -1,0 +1,75 @@
+### instructions quantifying pattern rotation ###
+
+I. Gather measurements in ImageJ for manipulating image shape
+1) open JPG in imageJ
+
+2) Use the straight line tool to draw a line from the tip of the rostrum to the end of the pelvis. Use Cntrl+m to record measurements. Save measurements as a text file.
+Note that the direction in which line is drawn matters (i.e. pelvis to rostrum vs rostrum to pelvis), and will cause the image to be flipped.
+I draw the line in pelvis to rostrum direction.
+
+3) Use the rectangle tool to draw a rectangle around the area that you want to crop. Save rectangle coordinates 'Save As' -> 'XY Coordinates'.
+
+II. Rescale and Rotate pattern in R
+1) Run the spatialTransform.R functions on the image
+
+III. Remove glare and fill in pattern with GIMP
+1) open the 'image_orientation_guidelines.png' in gimp. Set the guideline as the top layer and then align the image with the guideline to
+double check that the standardization worked.
+
+2) open the standardized image: 'File' -> 'Open as Layers...' 
+
+3) Use the Free Select Tool to select the dorsum of the frog. Cntrl+i to invert selection. 'Layer' -> 'New from Visible'.
+Press 'delete' to remove background (make transparent). Edit layer attributes to rename as 'black_fill'.
+
+4) Use a combination of the Magic Wand, Free Select Tool, and the Pencil Tool to fill in pattern areas with all black.
+
+5) Export the image as png with name sample_name_D.png
+
+6) Select the original sample layer. 'Layer' -> 'New from Visible'. Edit layer attributes to name the new layer 'DC'.
+Use the 'Free Select Tool' to select as much nonblack area of the dorsum as possible. Avoid shadows and glare.
+Cntrl+i to invert selection and then press 'Delete' so that only the captured area is left.
+Export the image as png with name sample_name_DC.png
+
+7) Select the original sample layer. 'Layer' -> 'New from Visible'. Edit layer attributes to name the new layer 'LC'.
+Use the 'Free Select Tool' to select as much nonblack area on rear legs as possible. Aoid shadows and glare.
+Cntrl+i to invert selection and then press 'Delete' so that only the captured area is left.
+Export the image as pang with name sample_name_LC.png 
+
+IV. Calculate gap score
+1) Run the rotationCombScore.R functions on the PNG image to calculate the pattern rotation in R:
+
+gapscore <- patRotList(imageDir='/home/tyler/Dropbox/research/imitator/sanger/imi_sanger_collab/imi_pedigree_images/pedigree/Lineage9/F2/standardized_reference', imageList='sample_name_for_gapscore.txt', patcolor=c(0,0,0), gap=20, xp=0.5, yp=0.5, hmin=20, vmin=20)
+
+2) write the table of scores
+
+write.table(gapscore, file='L9_F2_gapscore_gap20_xp050_yp050_hmin20_vmin20', col.names=TRUE, row.names=FALSE, quote=FALSE)
+
+V. Calculate the average dorsal color
+
+1) run the avgColor.R functions
+
+dorsal_color <- avgColorList(imageDir='/home/tyler/Dropbox/research/imitator/sanger/imi_sanger_collab/imi_pedigree_images/pedigree/Lineage9/F2/standardized_reference', imageList='sample_name_for_dorsalcolor.txt', sep='\t')
+
+2) write the table of measures
+
+write.table(dorsal_color, file='L9_F2_dorsal_color.txt', col.names=TRUE, row.names=TRUE, quote=FALSE, sep='\t')
+
+VI: Calculate the average leg color in Lab space:
+
+1) run the avgColor.R functions
+
+leg_color <- avgColorList(imageDir='/home/tyler/Dropbox/research/imitator/sanger/imi_sanger_collab/imi_pedigree_images/pedigree/Lineage9/F2/standardized_reference', imageList='sample_name_for_legcolor.txt')
+
+2) write table of measures
+
+write.table(leg_color, file='L9_F2_leg_color.txt', col.names=TRUE, row.names=TRUE, quote=FALSE, sep='\t')
+
+VII: Calculate black proportion on the dorsum:
+
+1) run the blackProportion.R functions
+
+black <- blackList(imageDir='/home/tyler/Dropbox/research/imitator/sanger/imi_sanger_collab/imi_pedigree_images/pedigree/Lineage9/F2/standardized_reference', imageList='sample_name_for_gapscore.txt')
+
+2) write table
+
+write.table(black, file='L9_F2_black_proportion.txt', col.names=TRUE, row.names=FALSE, quote=FALSE, sep='\t')
